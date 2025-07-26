@@ -36,6 +36,7 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCampaignCreated, 
   const [prompt, setPrompt] = useState('');
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const apiKeyAvailable = useMemo(() => !!process.env.API_KEY, []);
 
   useEffect(() => {
     if (step > 1) { 
@@ -125,14 +126,11 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCampaignCreated, 
   }
 
   const handleGeneratePortrait = async () => {
-    if (!prompt) return;
+    if (!prompt || !apiKeyAvailable) return;
     setGenerating(true);
     setGeneratedImage(null);
     try {
-        if (!process.env.API_KEY) {
-            throw new Error("Gemini API Key is not configured. Please set the API_KEY environment variable in your Netlify deployment settings.");
-        }
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
         const response = await ai.models.generateImages({
             model: 'imagen-3.0-generate-002',
             prompt: prompt,
@@ -421,8 +419,8 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCampaignCreated, 
                         <p className="text-sm text-stone-400 mb-2">An AI prompt has been generated based on your character. Feel free to edit it.</p>
                         <textarea value={prompt} onChange={e => setPrompt(e.target.value)} rows={5} className="w-full bg-stone-900 p-2 rounded border border-stone-600 mt-1" />
                     </div>
-                    <button onClick={handleGeneratePortrait} disabled={generating} className="w-full font-cinzel text-xl bg-emerald-800 hover:bg-emerald-700 disabled:bg-stone-600 text-white font-bold py-3 px-8 rounded-lg">
-                        {generating ? 'Generating...' : 'Generate Portrait'}
+                    <button onClick={handleGeneratePortrait} disabled={generating || !apiKeyAvailable} className="w-full font-cinzel text-xl bg-emerald-800 hover:bg-emerald-700 disabled:bg-stone-600 text-white font-bold py-3 px-8 rounded-lg">
+                        {generating ? 'Generating...' : !apiKeyAvailable ? 'API Key Missing' : 'Generate Portrait'}
                     </button>
                     {generating && <div className="text-center text-stone-400">The Vaesen are stirring... please wait.</div>}
                     {generatedImage && (
