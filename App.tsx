@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Campaign, CampaignCreationData, Character, Headquarters } from './types';
 import CharacterCreator from './components/CharacterCreator';
@@ -9,6 +10,7 @@ import WelcomeScreen from './components/WelcomeScreen';
 import CampaignJournal from './components/CampaignJournal';
 import Auth from './components/Auth';
 import { supabase } from './supabaseClient';
+import type { Database } from './supabaseClient';
 import { Session } from '@supabase/supabase-js';
 
 type View = 'CHARACTER' | 'DICE_ROLLER' | 'HEADQUARTERS' | 'JOURNAL';
@@ -71,7 +73,10 @@ const App: React.FC = () => {
         handleApiError(null, "Cannot create campaign without a user.");
         return;
     }
-    const campaignToInsert = { ...newCampaignData, user_id: session.user.id };
+    const campaignToInsert: Database['public']['Tables']['campaigns']['Insert'] = {
+      ...newCampaignData,
+      user_id: session.user.id,
+    };
     
     const { data, error } = await supabase
       .from('campaigns')
@@ -92,7 +97,7 @@ const App: React.FC = () => {
   const handleCampaignUpdate = async (updatedCampaign: Campaign) => {
     setActiveCampaign(updatedCampaign);
     const { id, character_data, headquarters_data, journal_data } = updatedCampaign;
-    const updateData = {
+    const updateData: Database['public']['Tables']['campaigns']['Update'] = {
         character_data,
         headquarters_data,
         journal_data,
