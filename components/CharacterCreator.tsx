@@ -36,7 +36,7 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCampaignCreated, 
   const [prompt, setPrompt] = useState('');
   const [generating, setGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const apiKeyAvailable = useMemo(() => !!process.env.API_KEY, []);
+  const apiKeyAvailable = useMemo(() => !!import.meta.env.VITE_API_KEY, []);
 
   useEffect(() => {
     if (step > 1) { 
@@ -130,7 +130,7 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCampaignCreated, 
     setGenerating(true);
     setGeneratedImage(null);
     try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+        const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY! });
         const response = await ai.models.generateImages({
             model: 'imagen-3.0-generate-002',
             prompt: prompt,

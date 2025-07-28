@@ -1,4 +1,3 @@
-
 export enum Attribute {
   Physique = 'Physique',
   Precision = 'Precision',
@@ -102,4 +101,15 @@ export interface CampaignCreationData {
   character_data: Character;
   headquarters_data: Headquarters;
   journal_data: string;
+}
+
+// Add this to fix import.meta.env errors
+interface ImportMetaEnv {
+  readonly VITE_SUPABASE_URL: string;
+  readonly VITE_SUPABASE_ANON_KEY: string;
+  readonly VITE_API_KEY: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
 }
